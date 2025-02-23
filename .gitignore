@@ -1,0 +1,8 @@
+# Local Netlify folder
+.netlify
+
+backend/node_modules
+node_modules
+.env
+private-key.pem
+build
