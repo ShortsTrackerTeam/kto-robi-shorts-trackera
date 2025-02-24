@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-background: #191970;
+  --color-primary: #ffffff;
+  --color-secondary-100: #f7f7f7;
+  --color-secondary-200: #e5e5e5;
+  --color-secondary-300: #d4d4d4;
+  --color-secondary-400: #a3a3a3;
+  --color-secondary-500: #737373;
+  --color-accent: #F5BD02;
+}
+
+html, body {
+  font-family: 'Inter', sans-serif;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-primary);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+/* Customowe klasy */
+.blur-card {
+  backdrop-filter: blur(10px);
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.golden-gradient {
+  background: linear-gradient(135deg, var(--color-accent) 0%, #FFD700 100%);
+}
+
+.blue-gradient {
+  background: linear-gradient(135deg, #191970 0%, #0000CD 100%);
+}
+
+.glass-effect {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
