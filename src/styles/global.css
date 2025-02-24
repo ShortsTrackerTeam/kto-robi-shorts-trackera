@@ -25,24 +25,25 @@ body {
   min-height: 100vh;
 }
 
-/* Customowe klasy */
-.blur-card {
-  backdrop-filter: blur(10px);
-  background-color: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+/* Podstawowe style komponentów */
+.bg-background {
+  background-color: var(--color-background);
 }
 
-.golden-gradient {
-  background: linear-gradient(135deg, var(--color-accent) 0%, #FFD700 100%);
+.text-primary {
+  color: var(--color-primary);
 }
 
-.blue-gradient {
-  background: linear-gradient(135deg, #191970 0%, #0000CD 100%);
+.text-accent {
+  color: var(--color-accent);
 }
 
+.bg-accent {
+  background-color: var(--color-accent);
+}
+
+/* Simplyfikujemy klasy customowe */
 .glass-effect {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 0.5rem;
 }

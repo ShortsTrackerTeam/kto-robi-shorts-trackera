@@ -20,8 +20,14 @@ function App() {
 
       // Równoległe zapytania do API
       const [githubResponse, jiraResponse] = await Promise.all([
-        fetchGithubStats(),
-        fetchJiraStats()
+        fetchGithubStats().catch(err => {
+          console.error('GitHub fetch error:', err);
+          return null;
+        }),
+        fetchJiraStats().catch(err => {
+          console.error('Jira fetch error:', err);
+          return null;
+        })
       ]);
 
       setGithubData(githubResponse);
@@ -46,37 +52,23 @@ function App() {
     return () => clearInterval(intervalId);
   }, []);
 
-  // Efekt gradientu w tle
-  const gradientStyle = {
-    background: `radial-gradient(circle at 10% 20%, ${loading ? '#0000CD' : '#1E1E7E'} 0%, #191970 60%)`,
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: -1,
-  };
-
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Gradient w tle */}
-      <div style={gradientStyle}></div>
-      
-      {/* Efekt świetlny w prawym górnym rogu */}
-      <div className="fixed top-0 right-0 w-96 h-96 bg-accent opacity-5 rounded-full blur-3xl"></div>
+    <div className="min-h-screen flex flex-col bg-background">
+      {/* Podstawowe tło */}
+      <div className="fixed inset-0 bg-background"></div>
       
       <Header onRefresh={fetchData} lastUpdated={lastUpdated} />
       
-      <main className="flex-grow container mx-auto px-4 py-8">
+      <main className="flex-grow container mx-auto px-4 py-8 relative z-10">
         {loading && !githubData && !jiraData ? (
-          <div className="flex items-center justify-center h-64">
+          <div className="flex items-center justify-center h-64 bg-opacity-10 bg-white p-8 rounded-lg">
             <div className="text-center">
               <div className="inline-block w-8 h-8 border-4 border-primary rounded-full border-t-accent animate-spin mb-4"></div>
               <p className="text-primary">Ładowanie danych...</p>
             </div>
           </div>
         ) : error ? (
-          <div className="glass-effect p-6 text-center">
+          <div className="bg-opacity-10 bg-white p-6 text-center rounded-lg">
             <p className="text-red-400">{error}</p>
             <button 
               onClick={fetchData}
