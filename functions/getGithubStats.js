@@ -12,7 +12,7 @@ exports.handler = async function(event, context) {
     console.log(`Rozpoczynam pobieranie danych z GitHub dla ${owner}/${repo}`);
     
     // Tworzymy instancję Octokit z uwierzytelnianiem aplikacji
-    const octokit = new Octokit({
+    let octokit = new Octokit({
       authStrategy: createAppAuth,
       auth: {
         appId: appId,
@@ -50,24 +50,89 @@ exports.handler = async function(event, context) {
       octokit = new Octokit({ auth: token.token });
     }
     
-    console.log('Pobieram listę commitów...');
+    console.log('Pobieram wszystkie commity z paginacją...');
     
-    // Pobranie danych o commitach
-    const { data: commits } = await octokit.rest.repos.listCommits({
-      owner,
-      repo,
-      per_page: 100 // Maksymalna liczba commitów
+    // Pobieramy wszystkie commity z paginacją
+    let allCommits = [];
+    let page = 1;
+    let hasNextPage = true;
+    
+    // Pobieramy commity strona po stronie (paginacja)
+    while (hasNextPage) {
+      console.log(`Pobieranie strony ${page} commitów...`);
+      const { data: commits, headers } = await octokit.rest.repos.listCommits({
+        owner,
+        repo,
+        per_page: 100, // Maksymalna liczba commitów na stronę
+        page: page
+      });
+      
+      if (commits.length === 0) {
+        hasNextPage = false;
+      } else {
+        allCommits = [...allCommits, ...commits];
+        page++;
+        
+        // Sprawdź czy są jeszcze strony do pobrania (z nagłówków)
+        if (headers.link) {
+          hasNextPage = headers.link.includes('rel="next"');
+        } else {
+          hasNextPage = false;
+        }
+      }
+    }
+    
+    console.log(`Znaleziono łącznie ${allCommits.length} commitów`);
+    
+    // Filtrujemy merge commity i commity bota
+    const filteredCommits = allCommits.filter(commit => {
+      // Ignoruj commity od dependabot
+      if (commit.author && commit.author.login === 'dependabot[bot]') {
+        return false;
+      }
+      
+      // Ignoruj merge commity
+      if (commit.commit.message.startsWith('Merge')) {
+        return false;
+      }
+      
+      return true;
     });
     
-    console.log(`Znaleziono ${commits.length} commitów`);
+    console.log(`Po filtrowaniu pozostało ${filteredCommits.length} commitów`);
     
-    // Pobieramy datę ostatniego commita
-    const lastCommitDate = commits.length > 0 ? commits[0].commit.author.date : null;
+    // Pobieramy datę ostatniego commita (po filtrowaniu)
+    const lastCommitDate = filteredCommits.length > 0 ? filteredCommits[0].commit.author.date : null;
+    
+    // Słownik mapowania nazw użytkowników na "Filip"
+    const nameMapping = {
+      'Filip Pocztarski': 'Filip',
+      'philornot': 'Filip',
+      'Phil': 'Filip',
+      'Julian Z': 'Julian',
+      'Julian': 'Julian',
+      'Mateusz Olczyk': 'Mateusz',
+      'matiyuyg': 'Mateusz',
+      'Matiyuyg': 'Mateusz',
+      'smyczynskidominik': 'Dominik',
+      'eevee2212': 'Dominik',
+      'Konrad K': 'Konrad',
+      'Faworek9': 'Konrad',
+      'Sheeper': 'Franek',
+      'Sheeper _1': 'Franek',
+      'Sheeper _': 'Franek',
+      'Sh33per': 'Franek'
+    };
     
     // Zliczamy commity według autorów
     const authorStats = {};
-    commits.forEach(commit => {
-      const authorName = commit.commit.author.name;
+    filteredCommits.forEach(commit => {
+      // Wyciągamy nazwę autora
+      let authorName = commit.commit.author.name;
+      
+      // Mapowanie imion i nazwisk według słownika
+      authorName = nameMapping[authorName] || authorName;
+      
       if (!authorStats[authorName]) {
         authorStats[authorName] = 0;
       }
@@ -78,7 +143,7 @@ exports.handler = async function(event, context) {
     const formattedStats = Object.entries(authorStats).map(([author, count]) => ({
       author,
       count,
-      percentage: Math.round((count / commits.length) * 100)
+      percentage: Math.round((count / filteredCommits.length) * 100)
     }));
     
     // Sortujemy według liczby commitów (malejąco)
@@ -94,7 +159,7 @@ exports.handler = async function(event, context) {
         'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify({
-        totalCommits: commits.length,
+        totalCommits: filteredCommits.length,
         lastCommitDate,
         authorStats: formattedStats
       })

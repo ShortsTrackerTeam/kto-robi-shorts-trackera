@@ -53,32 +53,29 @@ function App() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      {/* Podstawowe tło */}
-      <div className="fixed inset-0 bg-background"></div>
-      
+    <div className="min-h-screen bg-background flex flex-col">
       <Header onRefresh={fetchData} lastUpdated={lastUpdated} />
       
-      <main className="flex-grow container mx-auto px-4 py-8 relative z-10">
+      <main className="flex-grow container mx-auto px-4 py-6">
         {loading && !githubData && !jiraData ? (
-          <div className="flex items-center justify-center h-64 bg-opacity-10 bg-white p-8 rounded-lg">
+          <div className="flex items-center justify-center h-64">
             <div className="text-center">
               <div className="inline-block w-8 h-8 border-4 border-primary rounded-full border-t-accent animate-spin mb-4"></div>
-              <p className="text-primary">Ładowanie danych...</p>
+              <p className="text-primary text-lg">Ładowanie statystyk projektu...</p>
             </div>
           </div>
         ) : error ? (
-          <div className="bg-opacity-10 bg-white p-6 text-center rounded-lg">
-            <p className="text-red-400">{error}</p>
+          <div className="bg-white bg-opacity-5 rounded-lg p-6 text-center">
+            <p className="text-red-400 mb-4">{error}</p>
             <button 
               onClick={fetchData}
-              className="mt-4 px-4 py-2 rounded bg-accent text-background font-medium hover:bg-opacity-90 transition-colors"
+              className="px-4 py-2 rounded bg-accent text-background font-medium"
             >
               Spróbuj ponownie
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="space-y-8">
             {githubData && <GitHubStats data={githubData} />}
             {jiraData && <JiraStats data={jiraData} />}
           </div>

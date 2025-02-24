@@ -25,7 +25,6 @@ body {
   min-height: 100vh;
 }
 
-/* Podstawowe style komponentów */
 .bg-background {
   background-color: var(--color-background);
 }
@@ -42,8 +41,31 @@ body {
   background-color: var(--color-accent);
 }
 
-/* Simplyfikujemy klasy customowe */
-.glass-effect {
+/* Uproszczone efekty */
+.card {
   background-color: rgba(255, 255, 255, 0.05);
   border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.stat-bar {
+  height: 8px;
+  background-color: var(--color-accent);
+  border-radius: 4px;
+}
+
+.stat-row {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-row:last-child {
+  border-bottom: none;
 }
